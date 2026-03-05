@@ -8,6 +8,7 @@ import {
   CogIcon,
   CommandIcon,
   DatabaseIcon,
+  TerminalSquareIcon,
   FlameIcon,
   HomeIcon,
   KeyIcon,
@@ -134,6 +135,11 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
                 title: 'Commands',
                 href: route('commands', { server: page.props.server.id, site: site.id }),
                 icon: CommandIcon,
+              },
+              {
+                title: 'Console',
+                href: route('console', { server: page.props.server.id, site: site.id }),
+                icon: TerminalSquareIcon,
               },
               {
                 title: 'SSL',

@@ -45,6 +45,7 @@ use RuntimeException;
  * @property Collection<int, ServerLog> $logs
  * @property Collection<int, Deployment> $deployments
  * @property Collection<int, Command> $commands
+ * @property Collection<int, ConsoleCommand> $consoleCommands
  * @property ?GitHook $gitHook
  * @property Collection<int, DeploymentScript> $deploymentScripts
  * @property ?DeploymentScript $deploymentScript
@@ -164,6 +165,14 @@ class Site extends AbstractModel
     public function commands(): HasMany
     {
         return $this->hasMany(Command::class);
+    }
+
+    /**
+     * @return HasMany<ConsoleCommand, covariant $this>
+     */
+    public function consoleCommands(): HasMany
+    {
+        return $this->hasMany(ConsoleCommand::class);
     }
 
     /**
