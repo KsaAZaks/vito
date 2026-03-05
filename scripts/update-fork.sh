@@ -1,7 +1,10 @@
 #!/bin/bash
 
+set -e
+
 FORK_REPO="https://github.com/KsaAZaks/vito.git"
 FORK_BRANCH="3.x"
+VITO_DIR="/home/vito/vito"
 
 echo "
  __      ___ _        _____             _
@@ -17,7 +20,10 @@ echo "
 
 echo "Updating Vito from custom fork..."
 
-cd /home/vito/vito
+git config --global --add safe.directory "$VITO_DIR"
+export COMPOSER_ALLOW_SUPERUSER=1
+
+cd "$VITO_DIR"
 
 CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null)
 
@@ -48,6 +54,9 @@ php artisan migrate --force
 echo "Optimizing..."
 php artisan optimize:clear
 php artisan optimize
+
+echo "Fixing file ownership..."
+chown -R vito:vito "$VITO_DIR"
 
 echo "Restarting workers..."
 sudo supervisorctl restart worker:*
