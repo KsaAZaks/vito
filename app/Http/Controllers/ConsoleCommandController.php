@@ -21,7 +21,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 #[Middleware(['auth', 'has-project'])]
 class ConsoleCommandController extends Controller
 {
-    #[Get('/', name: 'console')]
+    #[Get('/', name: 'site-console')]
     public function index(Server $server, Site $site): Response
     {
         $this->authorize('viewAny', [ConsoleCommand::class, $site, $server]);
@@ -33,7 +33,7 @@ class ConsoleCommandController extends Controller
         ]);
     }
 
-    #[Post('/', name: 'console.run')]
+    #[Post('/', name: 'site-console.run')]
     public function run(Request $request, Server $server, Site $site): RedirectResponse
     {
         $this->authorize('create', [ConsoleCommand::class, $site, $server]);
@@ -44,7 +44,7 @@ class ConsoleCommandController extends Controller
             ->with('info', 'Command is being executed.');
     }
 
-    #[Get('/{consoleCommand}', name: 'console.show')]
+    #[Get('/{consoleCommand}', name: 'site-console.show')]
     public function show(Server $server, Site $site, ConsoleCommand $consoleCommand): Response
     {
         $this->authorize('view', [$consoleCommand, $site, $server]);
@@ -56,7 +56,7 @@ class ConsoleCommandController extends Controller
         ]);
     }
 
-    #[Post('/{consoleCommand}/rerun', name: 'console.rerun')]
+    #[Post('/{consoleCommand}/rerun', name: 'site-console.rerun')]
     public function rerun(Server $server, Site $site, ConsoleCommand $consoleCommand): RedirectResponse
     {
         $this->authorize('create', [ConsoleCommand::class, $site, $server]);
@@ -69,7 +69,7 @@ class ConsoleCommandController extends Controller
             ->with('info', 'Command is being executed.');
     }
 
-    #[Delete('/{consoleCommand}', name: 'console.destroy')]
+    #[Delete('/{consoleCommand}', name: 'site-console.destroy')]
     public function destroy(Server $server, Site $site, ConsoleCommand $consoleCommand): RedirectResponse
     {
         $this->authorize('delete', [$consoleCommand, $site, $server]);

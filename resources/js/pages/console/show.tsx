@@ -47,7 +47,7 @@ export default function Show() {
         <div className="flex items-start justify-between">
           <Heading title="Command details" />
           <div className="flex items-center gap-2">
-            <Link href={route('console', { server: page.props.server.id, site: page.props.site.id })}>
+            <Link href={route('site-console', { server: page.props.server.id, site: page.props.site.id })}>
               <Button variant="outline">
                 <ArrowLeftIcon />
                 <span className="hidden lg:block">Back to commands</span>

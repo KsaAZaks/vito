@@ -27,7 +27,7 @@ function Delete({ consoleCommand }: { consoleCommand: ConsoleCommand }) {
 
   const submit = () => {
     form.delete(
-      route('console.destroy', {
+      route('site-console.destroy', {
         server: consoleCommand.server_id,
         site: consoleCommand.site_id,
         consoleCommand: consoleCommand.id,
@@ -74,7 +74,7 @@ function Rerun({ consoleCommand }: { consoleCommand: ConsoleCommand }) {
 
   const submit = () => {
     form.post(
-      route('console.rerun', {
+      route('site-console.rerun', {
         server: consoleCommand.server_id,
         site: consoleCommand.site_id,
         consoleCommand: consoleCommand.id,
@@ -161,7 +161,7 @@ export const columns: ColumnDef<ConsoleCommand>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <Link
-                href={route('console.show', {
+                href={route('site-console.show', {
                   server: row.original.server_id,
                   site: row.original.site_id,
                   consoleCommand: row.original.id,

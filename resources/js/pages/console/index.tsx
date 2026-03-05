@@ -30,7 +30,7 @@ export default function Console() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    form.post(route('console.run', { server: page.props.server.id, site: page.props.site.id }), {
+    form.post(route('site-console.run', { server: page.props.server.id, site: page.props.site.id }), {
       preserveScroll: true,
       onSuccess: () => {
         form.reset('command');

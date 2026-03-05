@@ -138,7 +138,7 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
               },
               {
                 title: 'Console',
-                href: route('console', { server: page.props.server.id, site: site.id }),
+                href: route('site-console', { server: page.props.server.id, site: site.id }),
                 icon: TerminalSquareIcon,
               },
               {
