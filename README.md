@@ -50,6 +50,25 @@ Full ClickHouse database service integration including:
 - Dedicated UI pages for managing ClickHouse databases and users
 - SSH script templates for all ClickHouse operations
 
+### Site Console Commands
+
+Run arbitrary commands on the server from within a site's root directory, directly from the Vito panel:
+
+- Execute commands as the site's isolated user from **Sites > Console**
+- Commands run in the site's root directory with a 2-minute timeout
+- View command output in real-time with auto-refreshing logs
+- Command history with status tracking (executing, completed, failed)
+- Re-run previous commands with one click, copy commands to clipboard
+- Full backend: model, migration, policy, action, controller, and API resource
+
+### Laravel Log Viewing
+
+Automatic Laravel application log viewing from the panel:
+
+- When a Laravel site is created, `storage/logs/laravel.log` is automatically registered as a remote log
+- View, download, and clear Laravel logs directly from the site's **Logs** page
+- Uses the existing remote logs infrastructure (SSH `tail`)
+
 ### Custom Fork Install & Update Scripts
 
 - **`scripts/install-fork.sh`** — standalone installer that deploys this fork directly on a VPS (similar to the upstream install script but points to the fork repository)
