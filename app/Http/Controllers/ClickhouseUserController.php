@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\Clickhouse\CreateClickhouseUser;
 use App\Actions\Clickhouse\DeleteClickhouseUser;
+use App\Actions\Clickhouse\LinkClickhouseUser;
+use App\Http\Resources\DatabaseResource;
 use App\Http\Resources\DatabaseUserResource;
 use App\Models\DatabaseUser;
 use App\Models\Server;
@@ -17,6 +19,7 @@ use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Middleware;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
+use Spatie\RouteAttributes\Attributes\Put;
 
 #[Prefix('servers/{server}/clickhouse/users')]
 #[Middleware(['auth', 'has-project'])]
@@ -32,8 +35,13 @@ class ClickhouseUserController extends Controller
             ->where('service_id', $service?->id)
             ->simplePaginate(config('web.pagination_size'));
 
+        $databases = $server->databases()
+            ->where('service_id', $service?->id)
+            ->get();
+
         return Inertia::render('clickhouse-users/index', [
             'databaseUsers' => DatabaseUserResource::collection($users),
+            'databases' => DatabaseResource::collection($databases),
         ]);
     }
 
@@ -45,6 +53,16 @@ class ClickhouseUserController extends Controller
         app(CreateClickhouseUser::class)->create($server, $request->all());
 
         return back()->with('success', 'ClickHouse user created successfully.');
+    }
+
+    #[Put('/link/{databaseUser}', name: 'clickhouse-users.link')]
+    public function link(Request $request, Server $server, DatabaseUser $databaseUser): RedirectResponse
+    {
+        $this->authorizeClickhouse('create', $server);
+
+        app(LinkClickhouseUser::class)->link($databaseUser, $request->all());
+
+        return back()->with('success', 'ClickHouse user linked successfully.');
     }
 
     #[Delete('/{databaseUser}', name: 'clickhouse-users.destroy')]

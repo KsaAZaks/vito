@@ -10,14 +10,83 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { LoaderCircleIcon, MoreVerticalIcon } from 'lucide-react';
 import FormSuccessful from '@/components/form-successful';
 import { useState } from 'react';
 import { DatabaseUser } from '@/types/database-user';
+import { Database } from '@/types/database';
+import { Form, FormField, FormFields } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
+import InputError from '@/components/ui/input-error';
+import { MultiSelect } from '@/components/multi-select';
 import { Badge } from '@/components/ui/badge';
+
+function Link({ databaseUser }: { databaseUser: DatabaseUser }) {
+  const [open, setOpen] = useState(false);
+  const page = usePage<{
+    databases: Database[];
+  }>();
+  const form = useForm<{
+    databases: string[];
+  }>({
+    databases: databaseUser.databases ?? [],
+  });
+
+  const databases = page.props.databases.map((database) => ({
+    value: database.name,
+    label: database.name,
+  }));
+
+  const submit = () => {
+    form.put(route('clickhouse-users.link', { server: databaseUser.server_id, databaseUser: databaseUser.id }), {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Link</DropdownMenuItem>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Link user [{databaseUser.username}]</DialogTitle>
+          <DialogDescription className="sr-only">Link ClickHouse user to databases</DialogDescription>
+        </DialogHeader>
+        <Form id="link-clickhouse-user" onSubmit={submit} className="p-4">
+          <FormFields>
+            <FormField>
+              <Label htmlFor="databases">Databases</Label>
+              <MultiSelect
+                options={databases}
+                onValueChange={(value) => form.setData('databases', value)}
+                defaultValue={form.data.databases}
+                placeholder="Select database"
+                maxCount={5}
+              />
+              <InputError className="mt-2" message={form.errors.databases} />
+            </FormField>
+          </FormFields>
+        </Form>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button disabled={form.processing} onClick={submit}>
+            {form.processing && <LoaderCircleIcon className="animate-spin" />}
+            <FormSuccessful successful={form.recentlySuccessful} />
+            Save
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function Delete({ databaseUser }: { databaseUser: DatabaseUser }) {
   const [open, setOpen] = useState(false);
@@ -68,6 +137,24 @@ export const columns: ColumnDef<DatabaseUser>[] = [
     enableSorting: true,
   },
   {
+    accessorKey: 'databases',
+    header: 'Linked databases',
+    enableColumnFilter: true,
+    enableSorting: true,
+    cell: ({ row }) => {
+      const databases = row.original.databases ?? [];
+      return (
+        <div className="flex items-center">
+          {databases.map((database) => (
+            <Badge key={database} variant="outline" className="mr-1">
+              {database}
+            </Badge>
+          ))}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: 'created_at',
     header: 'Created at',
     enableColumnFilter: true,
@@ -100,6 +187,8 @@ export const columns: ColumnDef<DatabaseUser>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <Link databaseUser={row.original} />
+              <DropdownMenuSeparator />
               <Delete databaseUser={row.original} />
             </DropdownMenuContent>
           </DropdownMenu>

@@ -9,12 +9,14 @@ import { DataTable } from '@/components/data-table';
 import { PlusIcon } from 'lucide-react';
 import CreateClickhouseUser from '@/pages/clickhouse-users/components/create-user';
 import { DatabaseUser } from '@/types/database-user';
+import { Database } from '@/types/database';
 import { columns } from '@/pages/clickhouse-users/components/columns';
 import { PaginatedData } from '@/types';
 
 type Page = {
   server: Server;
   databaseUsers: PaginatedData<DatabaseUser>;
+  databases: Database[];
 };
 
 export default function ClickhouseUsers() {

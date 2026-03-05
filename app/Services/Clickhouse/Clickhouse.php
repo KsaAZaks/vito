@@ -112,6 +112,40 @@ class Clickhouse extends AbstractService
     }
 
     /**
+     * @param  array<string>  $databases
+     *
+     * @throws SSHError
+     */
+    public function link(string $username, array $databases, string $permission = 'admin'): void
+    {
+        $ssh = $this->service->server->ssh();
+
+        foreach ($databases as $database) {
+            $ssh->exec(
+                view($this->getScriptView('link'), [
+                    'username' => $username,
+                    'database' => $database,
+                    'permission' => $permission,
+                ]),
+                'link-clickhouse-user-to-database'
+            );
+        }
+    }
+
+    /**
+     * @throws SSHError
+     */
+    public function unlink(string $username): void
+    {
+        $this->service->server->ssh()->exec(
+            view($this->getScriptView('unlink'), [
+                'username' => $username,
+            ]),
+            'unlink-clickhouse-user-from-databases'
+        );
+    }
+
+    /**
      * @return array<array<string>>
      */
     public function getDatabases(): array
