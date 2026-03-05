@@ -20,6 +20,7 @@ import {
   Settings2Icon,
   SignpostIcon,
   UsersIcon,
+  WarehouseIcon,
 } from 'lucide-react';
 import { ReactNode, useEffect } from 'react';
 import { Server } from '@/types/server';
@@ -73,6 +74,26 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
         {
           title: 'Users',
           href: route('database-users', { server: page.props.server.id }),
+          icon: UsersIcon,
+        },
+      ],
+    },
+    {
+      title: 'ClickHouse',
+      href: route('clickhouse-databases', { server: page.props.server.id }),
+      icon: WarehouseIcon,
+      isDisabled: isMenuDisabled,
+      hidden: !page.props.server.services['clickhouse'],
+      children: [
+        {
+          title: 'Databases',
+          href: route('clickhouse-databases', { server: page.props.server.id }),
+          onlyActivePath: route('clickhouse-databases', { server: page.props.server.id }),
+          icon: DatabaseIcon,
+        },
+        {
+          title: 'Users',
+          href: route('clickhouse-users', { server: page.props.server.id }),
           icon: UsersIcon,
         },
       ],

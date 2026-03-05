@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $server_id
+ * @property ?int $service_id
  * @property string $username
  * @property string $password
  * @property array<string> $databases
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $host
  * @property DatabaseUserStatus $status
  * @property Server $server
+ * @property ?Service $service
  */
 class DatabaseUser extends AbstractModel
 {
@@ -25,6 +27,7 @@ class DatabaseUser extends AbstractModel
 
     protected $fillable = [
         'server_id',
+        'service_id',
         'username',
         'password',
         'databases',
@@ -35,6 +38,7 @@ class DatabaseUser extends AbstractModel
 
     protected $casts = [
         'server_id' => 'integer',
+        'service_id' => 'integer',
         'password' => 'encrypted',
         'databases' => 'array',
         'permission' => DatabaseUserPermission::class,
@@ -51,5 +55,13 @@ class DatabaseUser extends AbstractModel
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /**
+     * @return BelongsTo<Service, covariant $this>
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
     }
 }

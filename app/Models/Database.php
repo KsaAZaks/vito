@@ -12,11 +12,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $server_id
+ * @property ?int $service_id
  * @property string $name
- * @property string $collation
- * @property string $charset
+ * @property ?string $collation
+ * @property ?string $charset
  * @property DatabaseStatus $status
  * @property Server $server
+ * @property ?Service $service
  * @property Backup[] $backups
  * @property ?Carbon $deleted_at
  */
@@ -29,6 +31,7 @@ class Database extends AbstractModel
 
     protected $fillable = [
         'server_id',
+        'service_id',
         'name',
         'collation',
         'charset',
@@ -37,6 +40,7 @@ class Database extends AbstractModel
 
     protected $casts = [
         'server_id' => 'integer',
+        'service_id' => 'integer',
         'status' => DatabaseStatus::class,
     ];
 
@@ -63,6 +67,14 @@ class Database extends AbstractModel
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /**
+     * @return BelongsTo<Service, covariant $this>
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
     }
 
     /**

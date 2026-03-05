@@ -413,6 +413,15 @@ class Server extends AbstractModel
         return $this->service('database', $version);
     }
 
+    public function clickhouse(?string $version = null): ?Service
+    {
+        if ($version === null || $version === '' || $version === '0') {
+            return $this->defaultService('clickhouse');
+        }
+
+        return $this->service('clickhouse', $version);
+    }
+
     public function firewall(?string $version = null): ?Service
     {
         if ($version === null || $version === '' || $version === '0') {

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Plugins\RegisterServiceType;
+use App\Services\Clickhouse\Clickhouse;
 use App\Services\Database\Mariadb;
 use App\Services\Database\Mysql;
 use App\Services\Database\Postgresql;
@@ -25,6 +26,7 @@ class ServiceTypeServiceProvider extends ServiceProvider
     {
         $this->webservers();
         $this->databases();
+        $this->clickhouse();
         $this->memoryDatabases();
         $this->firewalls();
         $this->processManagers();
@@ -109,6 +111,31 @@ class ServiceTypeServiceProvider extends ServiceProvider
                 [
                     'name' => 'my.cnf',
                     'path' => '/etc/mysql/my.cnf',
+                    'sudo' => true,
+                ],
+            ])
+            ->register();
+    }
+
+    private function clickhouse(): void
+    {
+        RegisterServiceType::make(Clickhouse::id())
+            ->type(Clickhouse::type())
+            ->label('ClickHouse')
+            ->handler(Clickhouse::class)
+            ->versions([
+                '24.8',
+                '24.3',
+            ])
+            ->configPaths([
+                [
+                    'name' => 'config.xml',
+                    'path' => '/etc/clickhouse-server/config.xml',
+                    'sudo' => true,
+                ],
+                [
+                    'name' => 'users.xml',
+                    'path' => '/etc/clickhouse-server/users.xml',
                     'sudo' => true,
                 ],
             ])
