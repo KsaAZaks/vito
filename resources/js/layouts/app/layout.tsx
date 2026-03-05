@@ -6,7 +6,6 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { usePage } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 
@@ -37,27 +36,23 @@ export default function Layout({
     }
   }, [page.props.flash]);
 
-  const queryClient = new QueryClient();
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <SidebarProvider defaultOpen={!!(secondNavItems && secondNavItems.length > 0)}>
-          <AppSidebar secondNavItems={secondNavItems} secondNavTitle={secondNavTitle} />
-          <SidebarInset>
-            <AppHeader />
-            {breadcrumbs && breadcrumbs.length > 1 && (
-              <div className="border-sidebar-border/70 flex w-full border-b">
-                <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500">
-                  <Breadcrumbs breadcrumbs={breadcrumbs} />
-                </div>
+    <TooltipProvider>
+      <SidebarProvider defaultOpen={!!(secondNavItems && secondNavItems.length > 0)}>
+        <AppSidebar secondNavItems={secondNavItems} secondNavTitle={secondNavTitle} />
+        <SidebarInset>
+          <AppHeader />
+          {breadcrumbs && breadcrumbs.length > 1 && (
+            <div className="border-sidebar-border/70 flex w-full border-b">
+              <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500">
+                <Breadcrumbs breadcrumbs={breadcrumbs} />
               </div>
-            )}
-            <div className="flex flex-1 flex-col">{children}</div>
-            <Toaster richColors position="bottom-center" />
-          </SidebarInset>
-        </SidebarProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+            </div>
+          )}
+          <div className="flex flex-1 flex-col">{children}</div>
+          <Toaster richColors position="bottom-center" />
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
