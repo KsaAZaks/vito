@@ -48,6 +48,12 @@ git reset --hard "origin/$FORK_BRANCH"
 echo "Installing composer dependencies..."
 composer install --no-dev
 
+echo "Installing npm dependencies..."
+npm install --no-audit --no-fund
+
+echo "Building frontend assets..."
+npm run build
+
 echo "Running migrations..."
 php artisan migrate --force
 
