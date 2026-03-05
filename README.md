@@ -35,6 +35,34 @@ bash <(curl -Ls https://raw.githubusercontent.com/vitodeploy/vito/3.x/scripts/in
 - Workflows and Automations
 - Domains and DNS Management
 
+## Fork Modifications
+
+This is a custom fork of [VitoDeploy/vito](https://github.com/vitodeploy/vito) with the following additions:
+
+### ClickHouse Support
+
+Full ClickHouse database service integration including:
+
+- Install / uninstall ClickHouse (versions 24.3, 24.8)
+- Create and delete ClickHouse databases
+- Create and delete ClickHouse users
+- Link / unlink users to databases with granular access control
+- Dedicated UI pages for managing ClickHouse databases and users
+- SSH script templates for all ClickHouse operations
+
+### Custom Fork Install & Update Scripts
+
+- **`scripts/install-fork.sh`** — standalone installer that deploys this fork directly on a VPS (similar to the upstream install script but points to the fork repository)
+- **`scripts/update-fork.sh`** — pulls the latest changes from the fork, runs migrations, rebuilds frontend assets, and restarts workers
+
+```sh
+# Install
+bash <(curl -Ls https://raw.githubusercontent.com/KsaAZaks/vito/3.x/scripts/install-fork.sh)
+
+# Update
+bash /home/vito/vito/scripts/update-fork.sh
+```
+
 ## Useful Links
 
 - [Documentation](https://vitodeploy.com)
