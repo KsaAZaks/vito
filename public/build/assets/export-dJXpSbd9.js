@@ -1,1 +1,0 @@
-import{j as o}from"./app-Cgd02Kpg.js";import{B as r}from"./button-C8nnnALU.js";import{D as i}from"./download-Ct-QBFkF.js";import"./utils-CBhzaSSA.js";import"./index-DXLC_LsT.js";import"./createLucideIcon-BsuxPWA5.js";function a(){const t=()=>{window.open(route("vito-settings.export"),"_blank")};return o.jsxs(r,{onClick:t,children:[o.jsx(i,{}),"Export"]})}export{a as default};

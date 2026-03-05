@@ -5,7 +5,7 @@ import Container from '@/components/container';
 import Heading from '@/components/heading';
 import ServerLayout from '@/layouts/server/layout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react';
+import { ArrowLeftIcon } from 'lucide-react';
 import { ConsoleCommand } from '@/types/console-command';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,10 +20,7 @@ type Page = {
   consoleCommand: ConsoleCommand;
 };
 
-export default function Show() {
-  const page = usePage<Page>();
-  const cmd = page.props.consoleCommand;
-
+function CommandLogOutput({ cmd }: { cmd: ConsoleCommand }) {
   const logQuery = useQuery({
     queryKey: ['console-command-log', cmd.id],
     queryFn: async () => {
@@ -38,6 +35,30 @@ export default function Show() {
       return 2500;
     },
   });
+
+  if (!cmd.log) {
+    return (
+      <p className="text-muted-foreground text-center text-sm">
+        No output available. Command may not have any output, or output file is missing on the server.
+      </p>
+    );
+  }
+
+  return (
+    <LogOutput>
+      <>
+        {logQuery.isLoading && 'Loading...'}
+        {logQuery.isError && <div className="text-red-500">Error loading log output</div>}
+        {logQuery.data && !logQuery.isError && logQuery.data}
+        {!logQuery.isLoading && !logQuery.isError && !logQuery.data && <span className="text-muted-foreground">No output available</span>}
+      </>
+    </LogOutput>
+  );
+}
+
+export default function Show() {
+  const page = usePage<Page>();
+  const cmd = page.props.consoleCommand;
 
   return (
     <ServerLayout>
@@ -76,22 +97,7 @@ export default function Show() {
             <CardTitle>Command output</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            {!cmd.log ? (
-              <p className="text-muted-foreground text-center text-sm">
-                No output available. Command may not have any output, or output file is missing on the server.
-              </p>
-            ) : (
-              <LogOutput>
-                <>
-                  {logQuery.isLoading && 'Loading...'}
-                  {logQuery.isError && <div className="text-red-500">Error loading log output</div>}
-                  {logQuery.data && !logQuery.isError && logQuery.data}
-                  {!logQuery.isLoading && !logQuery.isError && !logQuery.data && (
-                    <span className="text-muted-foreground">No output available</span>
-                  )}
-                </>
-              </LogOutput>
-            )}
+            <CommandLogOutput cmd={cmd} />
           </CardContent>
         </Card>
       </Container>
