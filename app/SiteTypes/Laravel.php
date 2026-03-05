@@ -2,6 +2,7 @@
 
 namespace App\SiteTypes;
 
+use App\Models\ServerLog;
 use App\Models\Site;
 
 class Laravel extends PHPSite
@@ -14,6 +15,20 @@ class Laravel extends PHPSite
     public static function make(): self
     {
         return new self(new Site(['type' => self::id()]));
+    }
+
+    public function install(): void
+    {
+        parent::install();
+
+        ServerLog::create([
+            'server_id' => $this->site->server_id,
+            'site_id' => $this->site->id,
+            'is_remote' => true,
+            'name' => $this->site->path.'/storage/logs/laravel.log',
+            'type' => 'remote',
+            'disk' => 'ssh',
+        ]);
     }
 
     public function baseCommands(): array
