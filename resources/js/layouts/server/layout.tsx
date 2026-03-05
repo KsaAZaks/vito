@@ -8,6 +8,7 @@ import {
   CogIcon,
   CommandIcon,
   DatabaseIcon,
+  FileTextIcon,
   TerminalSquareIcon,
   FlameIcon,
   HomeIcon,
@@ -125,6 +126,11 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
                 href: route('application', { server: page.props.server.id, site: site.id }),
                 onlyActivePath: route('application', { server: page.props.server.id, site: site.id }),
                 icon: RocketIcon,
+              },
+              {
+                title: 'Environment',
+                href: route('environment', { server: page.props.server.id, site: site.id }),
+                icon: FileTextIcon,
               },
               {
                 title: 'Features',

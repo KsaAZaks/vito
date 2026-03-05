@@ -21,6 +21,9 @@ class Laravel extends PHPSite
     {
         parent::install();
 
+        $this->setupEnvFile();
+        $this->progress(85);
+
         ServerLog::create([
             'server_id' => $this->site->server_id,
             'site_id' => $this->site->id,
@@ -29,6 +32,21 @@ class Laravel extends PHPSite
             'type' => 'remote',
             'disk' => 'ssh',
         ]);
+    }
+
+    /**
+     * Copy .env.example to .env and generate application key if .env doesn't exist yet.
+     */
+    private function setupEnvFile(): void
+    {
+        $ssh = $this->site->server->ssh($this->site->user);
+        $path = $this->site->path;
+
+        $ssh->exec(
+            "cd {$path} && if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env && php artisan key:generate --force; fi",
+            'setup-env',
+            $this->site->id,
+        );
     }
 
     public function baseCommands(): array

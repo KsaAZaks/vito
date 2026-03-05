@@ -107,6 +107,14 @@ class ApplicationController extends Controller
         return back()->with('success', 'Deployment removed successfully.');
     }
 
+    #[Get('/environment', name: 'environment')]
+    public function environment(Server $server, Site $site): Response
+    {
+        $this->authorize('view', [$site, $server]);
+
+        return Inertia::render('environment/index');
+    }
+
     #[Get('/env', name: 'application.env')]
     public function env(Request $request, Server $server, Site $site): JsonResponse
     {
