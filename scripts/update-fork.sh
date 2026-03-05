@@ -54,6 +54,12 @@ npm install --no-audit --no-fund
 echo "Building frontend assets..."
 npm run build
 
+echo "Checking APP_KEY..."
+if ! grep -q "^APP_KEY=base64:" .env 2>/dev/null; then
+  echo "APP_KEY is missing, generating..."
+  php artisan key:generate --force
+fi
+
 echo "Running migrations..."
 php artisan migrate --force
 

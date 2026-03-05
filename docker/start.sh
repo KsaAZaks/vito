@@ -14,28 +14,24 @@ check_length() {
   fi
 }
 
-# Check if APP_KEY is set
+# Auto-generate APP_KEY if not provided
 if [ -z "$APP_KEY" ]; then
-  echo "APP_KEY is not set"
-  exit 1
-fi
-
-# Check if APP_KEY starts with 'base64:'
-if [[ $APP_KEY == base64:* ]]; then
-  # Remove 'base64:' prefix and decode the base64 string
-  decoded_key=$(echo "${APP_KEY:7}" | base64 --decode 2>/dev/null)
-
-  # Check if decoding was successful
-  if [ $? -ne 0 ]; then
-    echo "Invalid APP_KEY base64 encoding"
-    exit 1
-  fi
-
-  # Check the length of the decoded key
-  check_length "$decoded_key"
+  echo "APP_KEY is not set, generating automatically..."
+  APP_KEY=$(php /var/www/html/artisan key:generate --show)
+  export APP_KEY
+  sed -i "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|" /var/www/html/.env 2>/dev/null || true
 else
-  # Check the length of the raw APP_KEY
-  check_length "$APP_KEY"
+  # Validate provided APP_KEY
+  if [[ $APP_KEY == base64:* ]]; then
+    decoded_key=$(echo "${APP_KEY:7}" | base64 --decode 2>/dev/null)
+    if [ $? -ne 0 ]; then
+      echo "Invalid APP_KEY base64 encoding"
+      exit 1
+    fi
+    check_length "$decoded_key"
+  else
+    check_length "$APP_KEY"
+  fi
 fi
 
 # check if the flag file does not exist, indicating a first run
