@@ -33,7 +33,7 @@ function Link({ databaseUser }: { databaseUser: DatabaseUser }) {
   const form = useForm<{
     databases: string[];
   }>({
-    databases: databaseUser.databases,
+    databases: databaseUser.databases ?? [],
   });
 
   const databases = page.props.databases.map((database) => ({
@@ -154,7 +154,7 @@ export const columns: ColumnDef<DatabaseUser>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center">
-          {row.original.databases.map((database) => (
+          {(row.original.databases ?? []).map((database) => (
             <Badge key={database} variant="outline" className="mr-1">
               {database}
             </Badge>
