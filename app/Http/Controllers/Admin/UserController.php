@@ -20,7 +20,7 @@ use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
 #[Prefix('admin/users')]
-#[Middleware(['auth', 'must-be-admin'])]
+#[Middleware(['auth', 'must-be-admin:users'])]
 class UserController extends Controller
 {
     #[Get('/', name: 'users')]

@@ -11,24 +11,58 @@ import {
 import { FormEventHandler, ReactNode, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { Form, FormField, FormFields } from '@/components/ui/form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import InputError from '@/components/ui/input-error';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User } from '@/types/user';
+import { AdminPermission, User } from '@/types/user';
 import FormSuccessful from '@/components/form-successful';
+import { Checkbox } from '@/components/ui/checkbox';
+import { SharedData } from '@/types';
+
+const ALL_PERMISSIONS: { value: AdminPermission; label: string }[] = [
+  { value: 'dashboard', label: 'Dashboard' },
+  { value: 'users', label: 'Users' },
+  { value: 'servers', label: 'Servers' },
+  { value: 'sites', label: 'Sites' },
+  { value: 'credentials', label: 'Credentials' },
+  { value: 'plugins', label: 'Plugins' },
+  { value: 'settings', label: 'Settings' },
+];
 
 export default function UserForm({ user, children }: { user?: User; children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const page = usePage<SharedData>();
+  const currentUser = page.props.auth?.user;
+  const canManagePermissions = currentUser?.is_super_admin;
 
-  const form = useForm({
+  const form = useForm<{
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    admin_permissions: AdminPermission[];
+  }>({
     name: user?.name || '',
     email: user?.email || '',
     password: '',
     role: user?.is_admin ? 'admin' : 'user',
+    admin_permissions: user?.admin_permissions || [],
   });
+
+  const togglePermission = (permission: AdminPermission) => {
+    const current = form.data.admin_permissions;
+    if (current.includes(permission)) {
+      form.setData(
+        'admin_permissions',
+        current.filter((p) => p !== permission),
+      );
+    } else {
+      form.setData('admin_permissions', [...current, permission]);
+    }
+  };
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
@@ -97,6 +131,23 @@ export default function UserForm({ user, children }: { user?: User; children: Re
               </Select>
               <InputError message={form.errors.role} />
             </FormField>
+            {canManagePermissions && (
+              <FormField>
+                <Label>Admin Permissions</Label>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  {ALL_PERMISSIONS.map((perm) => (
+                    <label key={perm.value} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={form.data.admin_permissions.includes(perm.value)}
+                        onCheckedChange={() => togglePermission(perm.value)}
+                      />
+                      {perm.label}
+                    </label>
+                  ))}
+                </div>
+                <InputError message={form.errors.admin_permissions} />
+              </FormField>
+            )}
           </FormFields>
         </Form>
         <DialogFooter className="items-center">
@@ -105,7 +156,7 @@ export default function UserForm({ user, children }: { user?: User; children: Re
               Cancel
             </Button>
           </DialogClose>
-          <Button form="create-user-form" type="button" onClick={submit} disabled={form.processing}>
+          <Button form="user-form" type="button" onClick={submit} disabled={form.processing}>
             {form.processing && <LoaderCircle className="animate-spin" />}
             <FormSuccessful successful={form.recentlySuccessful} />
             Save

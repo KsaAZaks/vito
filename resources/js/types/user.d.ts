@@ -1,5 +1,7 @@
 import { Project } from '@/types/project';
 
+export type AdminPermission = 'dashboard' | 'users' | 'servers' | 'sites' | 'credentials' | 'plugins' | 'settings';
+
 export interface User {
   id: number;
   name: string;
@@ -12,5 +14,7 @@ export interface User {
   projects?: Project[];
   two_factor_enabled: boolean;
   is_admin: boolean;
-  [key: string]: unknown; // This allows for additional properties...
+  is_super_admin: boolean;
+  admin_permissions: AdminPermission[];
+  [key: string]: unknown;
 }

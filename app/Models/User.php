@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AdminPermission;
 use App\Enums\UserRole;
 use App\Traits\HasTimezoneTimestamps;
 use Carbon\Carbon;
@@ -38,6 +39,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $timezone
  * @property ?int $current_project_id
  * @property bool $is_admin
+ * @property ?array<string> $admin_permissions
  * @property ?Project $currentProject
  * @property Collection<int, Project> $projects
  * @property UserRole $role
@@ -60,6 +62,7 @@ class User extends Authenticatable
         'current_project_id',
         'is_admin',
         'role',
+        'admin_permissions',
     ];
 
     protected $hidden = [
@@ -72,6 +75,7 @@ class User extends Authenticatable
     protected $casts = [
         'role' => UserRole::class,
         'is_admin' => 'boolean',
+        'admin_permissions' => 'array',
     ];
 
     protected $appends = [];
@@ -191,9 +195,23 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->id === 1;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return $this->isSuperAdmin() || $this->is_admin || ! empty($this->admin_permissions);
+    }
+
+    public function hasAdminPermission(AdminPermission $permission): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return is_array($this->admin_permissions) && in_array($permission->value, $this->admin_permissions);
     }
 
     /**

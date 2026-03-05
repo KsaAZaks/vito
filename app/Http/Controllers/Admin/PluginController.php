@@ -26,7 +26,7 @@ use Spatie\RouteAttributes\Attributes\Prefix;
 use Throwable;
 
 #[Prefix('admin/plugins')]
-#[Middleware(['auth', 'must-be-admin'])]
+#[Middleware(['auth', 'must-be-admin:plugins'])]
 class PluginController extends Controller
 {
     #[Get('/', name: 'plugins')]

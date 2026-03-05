@@ -38,6 +38,8 @@ class ServerResource extends JsonResource
             'last_update_check' => $this->last_update_check,
             'status_color' => $this->status->getColor(),
             'features' => $this->features(),
+            'project' => new ProjectResource($this->whenLoaded('project')),
+            'creator' => new UserResource($this->whenLoaded('creator')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

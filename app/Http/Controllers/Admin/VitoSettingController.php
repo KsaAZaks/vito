@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
 
 #[Prefix('admin/vito')]
-#[Middleware(['auth', 'must-be-admin'])]
+#[Middleware(['auth', 'must-be-admin:settings'])]
 class VitoSettingController extends Controller
 {
     /**
