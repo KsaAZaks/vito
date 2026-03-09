@@ -26,7 +26,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/vitodeploy/vito/3.x/scripts/in
 - Manage your server's firewall
 - Supports Custom and Letsencrypt SSL
 - Uses supervisor to handle queues
-- Manages server's services
+- Manages server's services (MySQL: edit `my.cnf` and `mysqld.cnf` from the service menu)
 - Deploy your SSH Keys to the server
 - Create and Manage cron jobs on the server
 - API

@@ -11,6 +11,8 @@ Upstream base: **v3.20.3**.
 
 ### Added
 
+- **MySQL service** — "Edit mysqld.cnf" option for `/etc/mysql/mysql.conf.d/mysqld.cnf` in addition to "Edit my.cnf"
+
 - **File Manager** — full SSH-based file manager in the server panel
   - Browse directories with breadcrumb navigation
   - Create, rename, and delete files and directories

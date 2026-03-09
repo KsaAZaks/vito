@@ -73,6 +73,11 @@ class ServiceTypeServiceProvider extends ServiceProvider
                     'path' => '/etc/mysql/my.cnf',
                     'sudo' => true,
                 ],
+                [
+                    'name' => 'mysqld.cnf',
+                    'path' => '/etc/mysql/mysql.conf.d/mysqld.cnf',
+                    'sudo' => true,
+                ],
             ])
             ->register();
         RegisterServiceType::make(Postgresql::id())
