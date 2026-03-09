@@ -61,13 +61,16 @@ Run arbitrary commands on the server from within a site's root directory, direct
 - Re-run previous commands with one click, copy commands to clipboard
 - Full backend: model, migration, policy, action, controller, and API resource
 
-### Laravel Log Viewing
+### Enhanced Site Log Viewer
 
-Automatic Laravel application log viewing from the panel:
+Unified log viewer with support for multiple log sources:
 
-- When a Laravel site is created, `storage/logs/laravel.log` is automatically registered as a remote log
-- View, download, and clear Laravel logs directly from the site's **Logs** page
-- Uses the existing remote logs infrastructure (SSH `tail`)
+- Switch between **Site Log**, **Nginx Access Log**, and **Nginx Error Log** via a dropdown selector
+- Live auto-refreshing log content (every 5 seconds) with a manual refresh button
+- Download any log file directly from the viewer
+- Clear log file contents from a three-dot menu
+- Nginx log paths (`/var/log/nginx/{domain}-access.log`, `/var/log/nginx/{domain}-error.log`) are resolved automatically from the site domain
+- When a Laravel site is created, `storage/logs/laravel.log` is automatically registered as the site log
 
 ### File Manager
 

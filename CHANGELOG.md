@@ -21,6 +21,13 @@ Upstream base: **v3.20.3**.
   - Site-scoped mode to restrict access to a site's directory
   - New OS-level SSH helpers: `lsDirectory`, `rename`, `chmod`, `chown`, `compress`, `extract`
 
+- **Enhanced Site Log Viewer** — unified log viewer with multiple log sources
+  - Select between Site Log, Nginx Access Log, and Nginx Error Log from a dropdown
+  - Live auto-refreshing log content with manual refresh button
+  - Download any log file directly from the viewer
+  - Clear (delete contents of) any log file from a three-dot menu
+  - Nginx log paths resolved automatically from site domain
+
 - **Environment Editor** — edit `.env` files directly from the site panel
   - Monaco editor with `.env` syntax highlighting and dark/light mode
   - Optionally run `php artisan config:cache` after save
