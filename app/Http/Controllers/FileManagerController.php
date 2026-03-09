@@ -82,7 +82,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $sizeOutput = trim($server->ssh($site?->user)->exec("stat -c '%s' ".escapeshellarg($path)." 2>/dev/null || stat -f '%z' ".escapeshellarg($path)." 2>/dev/null"));
+            $sizeOutput = trim($server->ssh($site?->user)->exec("sudo stat -c '%s' ".escapeshellarg($path)." 2>/dev/null || sudo stat -f '%z' ".escapeshellarg($path)." 2>/dev/null"));
             $size = (int) $sizeOutput;
 
             if ($size > self::MAX_READ_SIZE) {
