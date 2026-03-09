@@ -28,7 +28,6 @@ type LogType = 'site' | 'nginx-access' | 'nginx-error';
 type Page = {
   server: Server;
   site: Site;
-  hasSiteLog: boolean;
 };
 
 const logTypeLabels: Record<LogType, string> = {
@@ -39,15 +38,11 @@ const logTypeLabels: Record<LogType, string> = {
 
 export default function SiteLogs() {
   const page = usePage<Page>();
-  const { server, site, hasSiteLog } = page.props;
+  const { server, site } = page.props;
 
-  const availableTypes: LogType[] = [];
-  if (hasSiteLog) {
-    availableTypes.push('site');
-  }
-  availableTypes.push('nginx-access', 'nginx-error');
+  const availableTypes: LogType[] = ['site', 'nginx-access', 'nginx-error'];
 
-  const [logType, setLogType] = useState<LogType>(availableTypes[0]);
+  const [logType, setLogType] = useState<LogType>('site');
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 

@@ -107,11 +107,7 @@ class SiteController extends Controller
     {
         $this->authorize('view', [$site, $server]);
 
-        $hasSiteLog = $site->logs()->where('is_remote', true)->exists();
-
-        return Inertia::render('sites/logs', [
-            'hasSiteLog' => $hasSiteLog,
-        ]);
+        return Inertia::render('sites/logs');
     }
 
     #[Get('/servers/{server}/sites/{site}/site-logs/{type}', name: 'sites.logs.show')]
@@ -184,10 +180,13 @@ class SiteController extends Controller
     {
         $log = $site->logs()->where('is_remote', true)->first();
 
-        if (! $log) {
-            abort(404, 'No site log found');
+        if ($log) {
+            return $log->name;
         }
 
-        return $log->name;
+        return match ($site->type) {
+            'laravel' => $site->path.'/storage/logs/laravel.log',
+            default => $site->path.'/storage/logs/laravel.log',
+        };
     }
 }
