@@ -11,6 +11,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { BookOpenIcon, LoaderCircleIcon, RefreshCwIcon } from 'lucide-react';
 import { registerDotEnvLanguage } from '@/lib/editor';
 import { useAppearance } from '@/hooks/use-appearance';
@@ -30,9 +31,13 @@ export default function Environment() {
   const form = useForm<{
     env: string;
     path: string;
+    cache: boolean;
+    queue: boolean;
   }>({
     env: '',
     path: site.type_data.env_path || `${site.path}/.env`,
+    cache: true,
+    queue: false,
   });
 
   const query = useQuery({
@@ -120,6 +125,26 @@ export default function Environment() {
               ) : (
                 <Skeleton className="h-full w-full rounded-none" />
               )}
+            </div>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between rounded-md border p-3">
+                <div>
+                  <div className="font-medium">Cache</div>
+                  <div className="text-muted-foreground text-sm">
+                    Run <code className="bg-muted rounded px-1 py-0.5 text-xs">php artisan config:cache</code> after updating environment variables.
+                  </div>
+                </div>
+                <Switch checked={form.data.cache} onCheckedChange={(checked) => form.setData('cache', checked)} />
+              </div>
+              <div className="flex items-center justify-between rounded-md border p-3">
+                <div>
+                  <div className="font-medium">Queues</div>
+                  <div className="text-muted-foreground text-sm">
+                    Run <code className="bg-muted rounded px-1 py-0.5 text-xs">php artisan queue:restart</code> after updating environment variables.
+                  </div>
+                </div>
+                <Switch checked={form.data.queue} onCheckedChange={(checked) => form.setData('queue', checked)} />
+              </div>
             </div>
             <div className="mt-4 flex items-center justify-end">
               <Button onClick={submit} disabled={form.processing || query.isLoading}>

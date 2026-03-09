@@ -18,6 +18,8 @@ class UpdateEnv
         Validator::make($input, [
             'env' => ['required', 'string'],
             'path' => ['nullable', 'string'],
+            'cache' => ['nullable', 'boolean'],
+            'queue' => ['nullable', 'boolean'],
         ])->validate();
 
         $typeData = $site->type_data ?? [];
@@ -30,5 +32,25 @@ class UpdateEnv
         );
 
         $site->jsonUpdate('type_data', 'env_path', $path);
+
+        $commands = [];
+
+        if (! empty($input['cache'])) {
+            $commands[] = 'php artisan config:cache';
+        }
+
+        if (! empty($input['queue'])) {
+            $commands[] = 'php artisan queue:restart';
+        }
+
+        if ($commands !== []) {
+            $site->server->os()->runScript(
+                path: $site->path,
+                script: implode("\n", $commands),
+                serverLog: null,
+                user: $site->user,
+                aliases: $site->environmentAliases(),
+            );
+        }
     }
 }
