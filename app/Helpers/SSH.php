@@ -6,6 +6,7 @@ use App\Exceptions\SSHAuthenticationError;
 use App\Exceptions\SSHCommandError;
 use App\Exceptions\SSHConnectionError;
 use App\Exceptions\SSHError;
+use App\Exceptions\SSHUploadFailed;
 use App\Models\Server;
 use App\Models\ServerLog;
 use Exception;
@@ -226,14 +227,18 @@ class SSH
         $tmpName = Str::random(10).strtotime('now');
         $tempPath = home_path($this->user).'/'.$tmpName;
 
-        $sftp->put($tempPath, $local, SFTP::SOURCE_LOCAL_FILE);
+        $uploaded = $sftp->put($tempPath, $local, SFTP::SOURCE_LOCAL_FILE);
 
-        $this->exec(sprintf('sudo mv %s %s', $tempPath, $remote));
+        if (! $uploaded) {
+            throw new SSHUploadFailed('Failed to upload file via SFTP');
+        }
+
+        $this->exec(sprintf('sudo mv %s %s', escapeshellarg($tempPath), escapeshellarg($remote)));
         if ($owner === null || $owner === '' || $owner === '0') {
             $owner = $this->user;
         }
-        $this->exec(sprintf('sudo chown %s:%s %s', $owner, $owner, $remote));
-        $this->exec(sprintf('sudo chmod 644 %s', $remote));
+        $this->exec(sprintf('sudo chown %s:%s %s', escapeshellarg($owner), escapeshellarg($owner), escapeshellarg($remote)));
+        $this->exec(sprintf('sudo chmod 644 %s', escapeshellarg($remote)));
     }
 
     /**

@@ -25,7 +25,10 @@ export default function UploadDialog({ open, currentPath, server, site, onClose,
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0];
-    if (!file) return;
+    if (!file) {
+      toast.error('Please select a file');
+      return;
+    }
 
     setUploading(true);
     setProgress(0);
@@ -37,7 +40,6 @@ export default function UploadDialog({ open, currentPath, server, site, onClose,
 
     try {
       await axios.post(route('file-manager.upload', { server: server.id }), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => {
           if (e.total) {
             setProgress(Math.round((e.loaded * 100) / e.total));
@@ -48,8 +50,12 @@ export default function UploadDialog({ open, currentPath, server, site, onClose,
       if (fileRef.current) fileRef.current.value = '';
       onSuccess();
       onClose();
-    } catch {
-      toast.error('Failed to upload file');
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error('Failed to upload file');
+      }
     } finally {
       setUploading(false);
       setProgress(0);
