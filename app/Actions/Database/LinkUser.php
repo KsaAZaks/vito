@@ -51,6 +51,7 @@ class LinkUser
         // Link the user to the selected databases with the user's permission
         $handler->link(
             $databaseUser->username,
+            $databaseUser->password,
             $databaseUser->host,
             $databaseUser->databases,
             $databaseUser->permission->value

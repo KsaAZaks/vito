@@ -410,4 +410,107 @@ class OS
             'clear-file'
         );
     }
+
+    /**
+     * @throws SSHError
+     */
+    public function rename(string $from, string $to, ?string $user = null): void
+    {
+        $this->server->ssh($user)->exec(
+            view('ssh.os.rename', [
+                'from' => $from,
+                'to' => $to,
+            ]),
+            'rename'
+        );
+    }
+
+    /**
+     * @throws SSHError
+     */
+    public function chmod(string $path, string $permissions, bool $recursive = false, ?string $user = null): void
+    {
+        $this->server->ssh($user)->exec(
+            view('ssh.os.chmod', [
+                'path' => $path,
+                'permissions' => $permissions,
+                'recursive' => $recursive,
+            ]),
+            'chmod'
+        );
+    }
+
+    /**
+     * @throws SSHError
+     */
+    public function chown(string $path, string $owner, string $group, bool $recursive = false, ?string $user = null): void
+    {
+        $this->server->ssh($user)->exec(
+            view('ssh.os.chown', [
+                'path' => $path,
+                'owner' => $owner,
+                'group' => $group,
+                'recursive' => $recursive,
+            ]),
+            'chown'
+        );
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     *
+     * @throws SSHError
+     */
+    public function lsDirectory(string $path, ?string $user = null): array
+    {
+        $output = $this->server->ssh($user)->exec(
+            view('ssh.os.ls-json', [
+                'path' => $path,
+            ])
+        );
+
+        $files = [];
+        $lines = explode("\n", $output);
+        $inBlock = false;
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === 'VITO_LS_START') {
+                $inBlock = true;
+
+                continue;
+            }
+            if ($line === 'VITO_LS_END') {
+                break;
+            }
+            if ($inBlock && str_starts_with($line, 'VITO_FILE:')) {
+                $data = substr($line, strlen('VITO_FILE:'));
+                $parts = explode('|', $data);
+                if (count($parts) >= 7) {
+                    $files[] = [
+                        'name' => $parts[0],
+                        'type' => $parts[1],
+                        'permissions' => $parts[2],
+                        'owner' => $parts[3],
+                        'group' => $parts[4],
+                        'size' => $parts[5],
+                        'modified_at' => $parts[6],
+                    ];
+                }
+            }
+        }
+
+        usort($files, function (array $a, array $b): int {
+            if ($a['type'] === 'directory' && $b['type'] !== 'directory') {
+                return -1;
+            }
+            if ($a['type'] !== 'directory' && $b['type'] === 'directory') {
+                return 1;
+            }
+
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        return $files;
+    }
 }

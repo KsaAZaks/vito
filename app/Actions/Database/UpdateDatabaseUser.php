@@ -104,6 +104,7 @@ class UpdateDatabaseUser
 
             $databaseHandler->link(
                 $databaseUser->username,
+                $databaseUser->password,
                 $newHost ?? $databaseUser->host,
                 $databaseUser->databases,
                 $databaseUser->permission->value

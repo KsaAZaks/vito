@@ -9,6 +9,7 @@ import {
   CommandIcon,
   DatabaseIcon,
   FileTextIcon,
+  FolderOpenIcon,
   TerminalSquareIcon,
   FlameIcon,
   HomeIcon,
@@ -133,6 +134,11 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
                 icon: FileTextIcon,
               },
               {
+                title: 'File Manager',
+                href: route('file-manager', { server: page.props.server.id }) + '?site=' + site.id,
+                icon: FolderOpenIcon,
+              },
+              {
                 title: 'Features',
                 href: route('site-features', { server: page.props.server.id, site: site.id }),
                 icon: BoxIcon,
@@ -214,6 +220,12 @@ export default function ServerLayout({ children }: { children: ReactNode }) {
       title: 'SSH Keys',
       href: route('server-ssh-keys', { server: page.props.server.id }),
       icon: KeyIcon,
+      isDisabled: isMenuDisabled,
+    },
+    {
+      title: 'File Manager',
+      href: route('file-manager', { server: page.props.server.id }),
+      icon: FolderOpenIcon,
       isDisabled: isMenuDisabled,
     },
     {

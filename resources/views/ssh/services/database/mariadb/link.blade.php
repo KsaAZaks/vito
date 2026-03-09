@@ -6,11 +6,12 @@
     };
 @endphp
 
-# Revoke all privileges first to ensure clean state
-if ! sudo mariadb -e "REVOKE ALL PRIVILEGES ON {{ $database }}.* FROM '{{ $username }}'@'{{ $host }}'"; then
-    # Ignore error if user has no privileges yet
-    true
+if ! sudo mariadb -e "CREATE USER IF NOT EXISTS '{{ $username }}'@'{{ $host }}' IDENTIFIED BY '{{ $password }}'"; then
+    echo 'VITO_SSH_ERROR' && exit 1
 fi
+
+# Revoke all privileges first to ensure clean state
+sudo mariadb -e "REVOKE ALL PRIVILEGES ON {{ $database }}.* FROM '{{ $username }}'@'{{ $host }}'" 2>/dev/null || true
 
 # Grant the specific privileges
 if ! sudo mariadb -e "GRANT {{ $grants }} ON {{ $database }}.* TO '{{ $username }}'@'{{ $host }}'"; then
