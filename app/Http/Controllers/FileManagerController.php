@@ -53,7 +53,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $files = $server->os()->lsDirectory($path);
+            $files = $server->os()->lsDirectory($path, $site?->user);
 
             return response()->json([
                 'path' => $path,
@@ -82,7 +82,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $sizeOutput = trim($server->ssh()->exec("stat -c '%s' ".escapeshellarg($path)." 2>/dev/null || stat -f '%z' ".escapeshellarg($path)." 2>/dev/null"));
+            $sizeOutput = trim($server->ssh($site?->user)->exec("stat -c '%s' ".escapeshellarg($path)." 2>/dev/null || stat -f '%z' ".escapeshellarg($path)." 2>/dev/null"));
             $size = (int) $sizeOutput;
 
             if ($size > self::MAX_READ_SIZE) {
@@ -91,7 +91,7 @@ class FileManagerController extends Controller
                 ], 422);
             }
 
-            $content = $server->os()->readFile($path);
+            $content = $server->os()->readFile($path, $site?->user);
 
             return response()->json([
                 'content' => $content,
@@ -121,7 +121,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $server->os()->write($path, $request->input('content'));
+            $server->os()->write($path, $request->input('content'), $site?->user);
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {
@@ -147,7 +147,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $server->ssh()->exec('touch '.escapeshellarg($path));
+            $server->ssh($site?->user)->exec('touch '.escapeshellarg($path));
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {
@@ -173,7 +173,7 @@ class FileManagerController extends Controller
         $this->validatePath($path, $site);
 
         try {
-            $server->os()->mkdir($path);
+            $server->os()->mkdir($path, $site?->user);
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {
@@ -202,7 +202,7 @@ class FileManagerController extends Controller
         $this->validatePath($to, $site);
 
         try {
-            $server->os()->rename($from, $to);
+            $server->os()->rename($from, $to, $site?->user);
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {
@@ -234,7 +234,7 @@ class FileManagerController extends Controller
         }
 
         try {
-            $server->os()->deleteFile($path);
+            $server->os()->deleteFile($path, $site?->user);
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {
@@ -265,7 +265,7 @@ class FileManagerController extends Controller
             $localPath = $file->getRealPath();
             $remotePath = rtrim($path, '/').'/'.$file->getClientOriginalName();
 
-            $server->ssh()->upload($localPath, $remotePath);
+            $server->ssh()->upload($localPath, $remotePath, $site?->user);
 
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
@@ -326,6 +326,7 @@ class FileManagerController extends Controller
                 $path,
                 $request->input('permissions'),
                 $request->boolean('recursive'),
+                $site?->user,
             );
 
             return response()->json(['success' => true]);
@@ -360,6 +361,7 @@ class FileManagerController extends Controller
                 $request->input('owner'),
                 $request->input('group'),
                 $request->boolean('recursive'),
+                $site?->user,
             );
 
             return response()->json(['success' => true]);
@@ -388,7 +390,7 @@ class FileManagerController extends Controller
         $archivePath = $path.'.tar.gz';
 
         try {
-            $server->os()->compress($path, $archivePath);
+            $server->os()->compress($path, $archivePath, $site?->user);
 
             return response()->json([
                 'success' => true,
@@ -420,7 +422,7 @@ class FileManagerController extends Controller
         $this->validatePath($destination, $site);
 
         try {
-            $server->os()->extract($path, $destination);
+            $server->os()->extract($path, $destination, $site?->user);
 
             return response()->json(['success' => true]);
         } catch (SSHError $e) {

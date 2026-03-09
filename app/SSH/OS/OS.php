@@ -198,9 +198,9 @@ class OS
     /**
      * @throws SSHError
      */
-    public function readFile(string $path): string
+    public function readFile(string $path, ?string $user = null): string
     {
-        return trim($this->server->ssh()->exec(
+        return trim($this->server->ssh($user)->exec(
             view('ssh.os.read-file', [
                 'path' => $path,
             ])
@@ -369,9 +369,9 @@ class OS
     /**
      * @throws SSHError
      */
-    public function compress(string $sourcePath, string $zipPath): void
+    public function compress(string $sourcePath, string $zipPath, ?string $user = null): void
     {
-        $this->server->ssh()->exec(
+        $this->server->ssh($user)->exec(
             view('ssh.os.compress', [
                 'sourcePath' => $sourcePath,
                 'zipPath' => $zipPath,
