@@ -69,6 +69,40 @@ Automatic Laravel application log viewing from the panel:
 - View, download, and clear Laravel logs directly from the site's **Logs** page
 - Uses the existing remote logs infrastructure (SSH `tail`)
 
+### File Manager
+
+A full-featured SSH file manager built into the server panel:
+
+- Browse server directories with breadcrumb navigation
+- Create, rename, and delete files and directories
+- Edit files in-browser (up to 1MB) with syntax-aware editor
+- Upload files (up to 50MB) and download files from the server
+- Change file permissions (`chmod`) and ownership (`chown`) with recursive support
+- Compress files/directories into `.tar.gz` archives and extract them
+- Site-scoped mode — restrict browsing to a specific site's directory
+
+### Environment Editor
+
+Edit `.env` files for your sites directly from the panel:
+
+- Monaco editor with `.env` syntax highlighting and dark/light mode support
+- After saving, optionally run `php artisan config:cache` and/or `php artisan queue:restart`
+- Support for custom `.env` file paths
+
+### Enhanced Admin Panel
+
+Extended admin panel with granular permissions and cross-user visibility:
+
+- Dashboard with system-wide stats (users, servers, sites, databases, database users)
+- Granular admin permissions per section: dashboard, users, servers, sites, credentials, plugins, settings
+- View and manage all servers and sites across all users
+- View all database credentials (usernames, passwords, linked databases) with show/hide toggle
+- Server provider credentials overview
+
+### Improved Database User Linking
+
+Password is now passed during MySQL/MariaDB user-database linking, improving compatibility with stricter MySQL authentication configurations.
+
 ### Custom Fork Install & Update Scripts
 
 - **`scripts/install-fork.sh`** — standalone installer that deploys this fork directly on a VPS (similar to the upstream install script but points to the fork repository)
