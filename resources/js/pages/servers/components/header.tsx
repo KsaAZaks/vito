@@ -25,14 +25,44 @@ export default function ServerHeader({ server, site }: { server: Server; site?: 
   };
 
   const [ipCopied, setIpCopied] = useState(false);
-  const copyIp = (ip: string) => {
-    navigator.clipboard.writeText(ip).then(() => {
+  const copyIp = (e: React.MouseEvent | React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const ip = server.ip;
+    if (!ip) return;
+
+    const onSuccess = () => {
       setIpCopied(true);
       toast.success('IP copied to clipboard');
-      setTimeout(() => {
-        setIpCopied(false);
-      }, 2000);
-    });
+      setTimeout(() => setIpCopied(false), 2000);
+    };
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(ip).then(onSuccess).catch(() => {
+        fallbackCopy(ip, onSuccess);
+      });
+    } else {
+      fallbackCopy(ip, onSuccess);
+    }
+  };
+
+  const fallbackCopy = (text: string, onSuccess: () => void) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      if (document.execCommand('copy')) {
+        onSuccess();
+      } else {
+        toast.error('Failed to copy IP');
+      }
+    } catch {
+      toast.error('Failed to copy IP');
+    }
+    document.body.removeChild(textarea);
   };
 
   return (
@@ -65,20 +95,18 @@ export default function ServerHeader({ server, site }: { server: Server; site?: 
               <span>{server.status}</span>
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="cursor-pointer lg:inline-flex" onClick={() => copyIp(server.ip)}>
-                {ipCopied ? (
-                  <CheckIcon className="text-success size-3" />
-                ) : (
-                  server.ip
-                )}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              <span>{ipCopied ? 'Copied!' : 'Click to copy IP'}</span>
-            </TooltipContent>
-          </Tooltip>
+          <button
+            type="button"
+            title={ipCopied ? 'Copied!' : 'Click to copy IP'}
+            className="cursor-pointer border-0 bg-transparent p-0 text-left text-xs font-normal text-inherit outline-none hover:opacity-80 lg:inline-flex"
+            onClick={copyIp}
+          >
+            {ipCopied ? (
+              <CheckIcon className="text-success size-3" />
+            ) : (
+              server.ip
+            )}
+          </button>
           {['installing', 'installation_failed'].includes(server.status) && (
             <>
               <SlashIcon className="size-3" />
