@@ -9,6 +9,12 @@ Upstream base: **v3.20.3**.
 
 ## [Unreleased] — 2026-03-19
 
+### Fixed
+
+- **Permissions after failed site installation** — Commands, Console, SSL, and Redirects (list) policies required `site->isReady()`, which blocked access when status was `installation_failed`. They now use `Site::allowsSshBackedManagement()` (ready **or** installation failed) so you can debug and fix the server.
+
+- **SSH failure logs** — when a remote command fails, exceptions and logs (including `site-installation-failed`) now include exit code and up to ~12k chars of captured remote output instead of only “SSH command failed with an error”.
+
 ### Added
 
 - **Application: retry after failed installation** — when site installation fails (e.g. missing `.env.example`), the Application page now shows the full UI with Deploy button and deployments table instead of only logs. A "Retry installation" button re-runs the site type install (e.g. Laravel’s install); you can also run Deploy after fixing the repo.

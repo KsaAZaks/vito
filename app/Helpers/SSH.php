@@ -197,13 +197,16 @@ class SSH
             });
             if ($this->connection->getExitStatus() !== 0 || Str::contains($output, 'VITO_SSH_ERROR')) {
                 throw new SSHCommandError(
-                    message: 'SSH command failed with an error',
+                    message: $this->formatSshCommandFailureMessage($output),
                     log: $this->log
                 );
             }
 
             return $output;
         } catch (Throwable $e) {
+            if ($e instanceof SSHCommandError) {
+                throw $e;
+            }
             Log::error('Error executing command', [
                 'msg' => $e->getMessage(),
                 'log' => $this->log,
@@ -214,6 +217,30 @@ class SSH
                 log: $this->log
             );
         }
+    }
+
+    /**
+     * Build a log-friendly message when a remote command exits non-zero or signals VITO_SSH_ERROR.
+     */
+    private function formatSshCommandFailureMessage(string $output): string
+    {
+        $exit = $this->connection->getExitStatus();
+        $exitLabel = $exit === false ? 'unknown' : (string) $exit;
+        $lines = [
+            'SSH command failed (exit code '.$exitLabel.').',
+        ];
+        if (Str::contains($output, 'VITO_SSH_ERROR')) {
+            $lines[] = 'Output contained VITO_SSH_ERROR.';
+        }
+        $trimmed = trim($output);
+        if ($trimmed !== '') {
+            $lines[] = 'Remote output:';
+            $lines[] = Str::limit($trimmed, 12000, "\n… (truncated)");
+        } else {
+            $lines[] = 'No output was captured from the remote command.';
+        }
+
+        return implode("\n", $lines);
     }
 
     /**

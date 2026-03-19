@@ -18,7 +18,7 @@ class SslPolicy
     {
         return $this->hasReadAccess($user, $server->project) &&
             $server->isReady() &&
-            $site->isReady();
+            $site->allowsSshBackedManagement();
     }
 
     public function view(User $user, Ssl $ssl, Site $site, Server $server): bool
@@ -26,7 +26,7 @@ class SslPolicy
         return $this->hasReadAccess($user, $server->project) &&
             $site->server_id === $server->id &&
             $server->isReady() &&
-            $site->isReady() &&
+            $site->allowsSshBackedManagement() &&
             $ssl->site_id === $site->id;
     }
 
@@ -34,7 +34,7 @@ class SslPolicy
     {
         return $this->hasWriteAccess($user, $server->project) &&
             $server->isReady() &&
-            $site->isReady();
+            $site->allowsSshBackedManagement();
     }
 
     public function update(User $user, Ssl $ssl, Site $site, Server $server): bool
@@ -42,7 +42,7 @@ class SslPolicy
         return $this->hasWriteAccess($user, $server->project) &&
             $site->server_id === $server->id &&
             $server->isReady() &&
-            $site->isReady() &&
+            $site->allowsSshBackedManagement() &&
             $ssl->site_id === $site->id;
     }
 
@@ -51,7 +51,7 @@ class SslPolicy
         return $this->hasWriteAccess($user, $server->project) &&
             $site->server_id === $server->id &&
             $server->isReady() &&
-            $site->isReady() &&
+            $site->allowsSshBackedManagement() &&
             $ssl->site_id === $site->id;
     }
 }

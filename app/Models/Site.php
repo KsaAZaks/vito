@@ -136,6 +136,15 @@ class Site extends AbstractModel
     }
 
     /**
+     * Whether SSH-backed site features (commands, console, SSL, redirects list, etc.) are allowed.
+     * Installation-failed sites still need access so operators can debug and fix the server.
+     */
+    public function allowsSshBackedManagement(): bool
+    {
+        return in_array($this->status, [SiteStatus::READY, SiteStatus::INSTALLATION_FAILED], true);
+    }
+
+    /**
      * @return BelongsTo<Server, covariant $this>
      */
     public function server(): BelongsTo

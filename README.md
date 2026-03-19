@@ -61,6 +61,10 @@ Run arbitrary commands on the server from within a site's root directory, direct
 - Re-run previous commands with one click, copy commands to clipboard
 - Full backend: model, migration, policy, action, controller, and API resource
 
+### Site management after failed installation
+
+If installation fails (`installation_failed`), site-scoped features that use SSH (Commands, Console, SSL, Redirects list) remain authorized so you are not blocked by “You don’t have permission to perform this action.”
+
 ### Application: Deploy and retry after failed installation
 
 When site installation fails (e.g. Laravel site without `.env.example`), the Application page now shows the full UI instead of only logs:

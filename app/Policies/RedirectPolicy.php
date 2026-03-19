@@ -16,7 +16,7 @@ class RedirectPolicy
     {
         return $this->hasReadAccess($user, $server->project) &&
             $server->isReady() &&
-            $site->isReady();
+            $site->allowsSshBackedManagement();
     }
 
     public function view(User $user, Redirect $redirect, Site $site, Server $server): bool
