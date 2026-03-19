@@ -7,7 +7,9 @@ use App\Actions\Site\Rollback;
 use App\Actions\Site\UpdateDeploymentScript;
 use App\Actions\Site\UpdateEnv;
 use App\Actions\Site\UpdateLoadBalancer;
+use App\Enums\SiteStatus;
 use App\Exceptions\DeploymentScriptIsEmptyException;
+use App\Jobs\Site\CreateJob;
 use App\Exceptions\FailedToDestroyGitHook;
 use App\Exceptions\SourceControlIsNotConnected;
 use App\Exceptions\SSHError;
@@ -77,6 +79,25 @@ class ApplicationController extends Controller
         app(Deploy::class)->run($site);
 
         return back()->with('info', 'Deployment started, please wait...');
+    }
+
+    #[Post('/retry-installation', name: 'application.retry-installation')]
+    public function retryInstallation(Server $server, Site $site): RedirectResponse
+    {
+        $this->authorize('update', [$site, $server]);
+
+        if (! $site->isInstallationFailed()) {
+            return back()->with('error', 'Retry installation is only available when site installation has failed.');
+        }
+
+        $site->update([
+            'status' => SiteStatus::INSTALLING,
+            'progress' => 0,
+        ]);
+
+        dispatch(new CreateJob($site))->onQueue('ssh');
+
+        return back()->with('info', 'Installation has been restarted. Please wait...');
     }
 
     #[Post('/rollback/{deployment}', name: 'application.rollback')]

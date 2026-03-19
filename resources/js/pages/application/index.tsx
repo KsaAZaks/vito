@@ -22,7 +22,9 @@ export default function Application() {
 
   siteHelper.storeSite(page.props.site);
 
-  if (page.props.site.status !== 'ready') {
+  // Only show "Installing site" (logs only) when installation is in progress.
+  // When installation_failed, show full Application view so user can Deploy or Retry installation.
+  if (page.props.site.status === 'installing') {
     return (
       <ServerLayout>
         <Head title={`${page.props.site.domain} - ${page.props.server.name}`} />

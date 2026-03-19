@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\DeploymentStatus;
+use App\Enums\SiteStatus;
 use App\Enums\WorkerStatus;
 use App\Facades\SSH;
+use App\Jobs\Site\CreateJob;
 use App\Models\Deployment;
 use App\Models\GitHook;
 use App\Models\Site;
@@ -14,6 +16,7 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -32,6 +35,43 @@ class ApplicationTest extends TestCase
         ]))
             ->assertSuccessful()
             ->assertInertia(fn (AssertableInertia $page) => $page->component('application/index'));
+    }
+
+    public function test_retry_installation_when_installation_failed(): void
+    {
+        Queue::fake();
+
+        $this->site->update(['status' => SiteStatus::INSTALLATION_FAILED, 'progress' => 65]);
+
+        $this->actingAs($this->user);
+
+        $this->post(route('application.retry-installation', [
+            'server' => $this->server,
+            'site' => $this->site,
+        ]))
+            ->assertSessionHas('info')
+            ->assertRedirect();
+
+        $this->site->refresh();
+        $this->assertEquals(SiteStatus::INSTALLING, $this->site->status);
+        $this->assertEquals(0, $this->site->progress);
+
+        Queue::assertPushed(CreateJob::class);
+    }
+
+    public function test_retry_installation_rejected_when_site_not_installation_failed(): void
+    {
+        $this->actingAs($this->user);
+
+        $this->post(route('application.retry-installation', [
+            'server' => $this->server,
+            'site' => $this->site,
+        ]))
+            ->assertSessionHas('error')
+            ->assertRedirect();
+
+        $this->site->refresh();
+        $this->assertEquals(SiteStatus::READY, $this->site->status);
     }
 
     public function test_update_deployment_script(): void

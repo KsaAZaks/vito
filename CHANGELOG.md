@@ -7,9 +7,11 @@ Upstream base: **v3.20.3**.
 
 ---
 
-## [Unreleased] — 2026-03-09
+## [Unreleased] — 2026-03-19
 
 ### Added
+
+- **Application: retry after failed installation** — when site installation fails (e.g. missing `.env.example`), the Application page now shows the full UI with Deploy button and deployments table instead of only logs. A "Retry installation" button re-runs the site type install (e.g. Laravel’s install); you can also run Deploy after fixing the repo.
 
 - **MySQL service** — "Edit mysqld.cnf" option for `/etc/mysql/mysql.conf.d/mysqld.cnf` in addition to "Edit my.cnf"
 

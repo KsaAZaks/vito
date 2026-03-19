@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Site } from '@/types/site';
 import ServerLayout from '@/layouts/server/layout';
 import { Server } from '@/types/server';
@@ -6,7 +6,8 @@ import Container from '@/components/container';
 import HeaderContainer from '@/components/header-container';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
-import { BookOpenIcon, MoreHorizontalIcon, RocketIcon } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BookOpenIcon, LoaderCircleIcon, MoreHorizontalIcon, RefreshCwIcon, RocketIcon, TriangleAlert } from 'lucide-react';
 import { PaginatedData } from '@/types';
 import { Deployment } from '@/types/deployment';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -27,12 +28,29 @@ export default function AppWithDeployment() {
     buildScript?: DeploymentScriptType;
     preFlightScript?: DeploymentScriptType;
   }>();
+  const retryForm = useForm();
+  const isInstallationFailed = page.props.site.status === 'installation_failed';
+
+  const retryInstallation = () => {
+    retryForm.post(
+      route('application.retry-installation', { server: page.props.site.server_id, site: page.props.site.id })
+    );
+  };
 
   return (
     <ServerLayout>
       <Head title={`${page.props.site.domain} - ${page.props.server.name}`} />
 
       <Container className="max-w-5xl">
+        {isInstallationFailed && (
+          <Alert variant="destructive" className="mb-4">
+            <TriangleAlert className="size-4" />
+            <AlertDescription>
+              Site installation failed. You can fix the issue (e.g. add .env.example to the repo) and then Retry
+              installation, or run Deploy to run the deployment script.
+            </AlertDescription>
+          </Alert>
+        )}
         <HeaderContainer>
           <Heading title="Application" description="Here you can manage the deployed application" />
           <div className="flex items-center gap-2">
@@ -42,6 +60,17 @@ export default function AppWithDeployment() {
                 <span className="hidden lg:block">Docs</span>
               </Button>
             </a>
+            {isInstallationFailed && (
+              <Button
+                variant="outline"
+                onClick={retryInstallation}
+                disabled={retryForm.processing}
+              >
+                {retryForm.processing && <LoaderCircleIcon className="size-4 animate-spin" />}
+                <RefreshCwIcon />
+                <span className="hidden lg:block">Retry installation</span>
+              </Button>
+            )}
             <Deploy site={page.props.site}>
               <Button>
                 <RocketIcon />
